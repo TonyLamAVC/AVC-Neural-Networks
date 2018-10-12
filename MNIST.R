@@ -33,7 +33,8 @@ summary(model)
 
 model %>% compile(
   loss = 'categorical_crossentropy',
-  optimizer = optimizer_adam(),
+  optimizer = rms_prop(),
+#  optimizer = optimizer_adam(),
   metrics = c('accuracy')
 )
 
