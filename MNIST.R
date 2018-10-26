@@ -6,18 +6,23 @@
 
 library(keras)
 mnist <- dataset_mnist()
+
+# Extract the training and test data.
+
 x_train <- mnist$train$x
 y_train <- mnist$train$y
 x_test <- mnist$test$x
 y_test <- mnist$test$y
 
-# reshape
+# Reshape 28x28 pixels greyscale.
 x_train <- array_reshape(x_train, c(nrow(x_train), 784))
 x_test <- array_reshape(x_test, c(nrow(x_test), 784))
-# rescale
+
+# Normalize greyscale to 0-1.  (Max-min normalization.)
 x_train <- x_train / 255
 x_test <- x_test / 255
 
+# One-hot encoding of digit identification (0 if not the digit, 1 if the digit for 10 columns 0-9)
 y_train <- to_categorical(y_train, 10)
 y_test <- to_categorical(y_test, 10)
 
@@ -31,6 +36,7 @@ model %>% #256, 128
 
 summary(model)
 
+# Load optimization model and cost function.
 model %>% compile(
   loss = 'categorical_crossentropy',
   optimizer = rms_prop(),
@@ -38,15 +44,23 @@ model %>% compile(
   metrics = c('accuracy')
 )
 
+# Training data with cross validation split of certain percentage.
+# Does it resplit to validate on different epoch?
 history <- model %>% fit(
   x_train, y_train, 
   epochs = 30, batch_size = 128, 
   validation_split = 0.2
 )
 
+# Run the model on the test data.
 model %>% evaluate(x_test, y_test)
 
-# Example Change
+# Generate predictions on new data.
+model %>% predict_classes(x_test)
+
+# Would it be useful to indentify which predictions are correct and which are not?  If so, maybe some insight to why it does or doesn't work can be gained.
+
+# Example Change - I can't remember what this next part of the code does.  Does it train and test on the same data?
 y_new <- model %>% predict_classes(x_test)
 y_new <- to_categorical(y_new, 10)
 
